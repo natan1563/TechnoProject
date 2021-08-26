@@ -15,6 +15,22 @@
 <body>
     
     <div id="app">
+    <!-- <button @click="removerItem">remove</button> -->
+        <header class="header">
+            <img src="./assets/techno.svg" alt="Techno" class="logo">
+            <div class="carrinho_menu" @click="carrinhoAtivo = true">{{ carrinhoTotal | numeroPreco}} | {{ carrinho.length}} itens no carrinho </div>
+        </header>
+
+        <section class="produtos">
+            <div v-for="item in produtos" class="produto" @click="abrirModal(item.id)" :key="item.id">
+                <img :src="item.img" :alt="item.nome" class="produto_img">
+
+                <div class="produto_info">
+                    <span class="produto_preco">{{ item.preco | numeroPreco }} </span>
+                    <h2 class="produto_titulo">{{ item.nome }} </span>
+                </div>
+            </div>
+        </section>
 
         <section class="modal" v-if="produto" @click="fecharModal">
             <div class="modal_container">
@@ -24,11 +40,12 @@
 
                 <div class="modal_dados">
                     <button class="modal_fechar" @click="produto = false">X</button>
-                    <span class="modal_preco"> {{ produto.preco }}</span>
+                    <span class="modal_preco"> {{ produto.preco | numeroPreco}}</span>
                     <h2 class="modal_titulo">{{ produto.nome }}</h2>
                     <p class="modal_descricao"> {{ produto.descricao }}</p>
-
-                    <button class="modal_btn">Adicionar Item</button>
+                    
+                    <button v-if="produto.estoque > 0" class="modal_btn" @click="adicionarItem">Adicionar Item</button>
+                    <button v-else class="modal_btn esgotado" disabled>Produto Esgotado</button>
                 </div>
 
                 <div class="avaliacoes">
@@ -43,16 +60,31 @@
             </div>
         </section>
 
-        <section class="produtos">
-            <div v-for="item in produtos" class="produto" @click="abrirModal(item.id)" :key="item.id">
-                <img :src="item.img" :alt="item.nome" class="produto_img">
+        <section class="carrinho_modal" :class="{ativo: carrinhoAtivo}" @click="clickForaCarrinho">
+            <div class="carrinho_container">
+							<button class="carrinho_fechar" @click="carrinhoAtivo = false">X</button>
 
-                <div class="produto_info">
-                    <span class="produto_preco">{{ item.preco | numeroPreco }} </span>
-                    <h2 class="produto_titulo">{{ item.nome }} </span>
-                </div>
-            </div>
+							<h2 class="carrinho_titulo">Carrinho</h2>
+
+							<div v-if="carrinho.length > 0">
+								<ul class="carrinho_lista">
+									<li v-for="(item, index) in carrinho" class="carrinho_item">
+										<p>{{ item.nome }}</p>
+										<p class="carrinho_preco">{{ item.preco | numeroPreco }}</p>
+										<button class="carrinho_remover" @click="removerItem(index)">X</button>
+									</li>
+								</ul>
+								<p class="carrinho_total">{{ carrinhoTotal | numeroPreco}}</p>
+								<button class="carrinho_finalizar">Finalizar compra</button>
+							</div>
+
+							<p v-else>O carrinho esta vazio</p>
+						</div>
         </section>
+
+        <div class="alerta" :class="{ativo: alertaAtivo}">
+            <p class="alerta_mensagem"> {{ mensagemAlerta }}</p>
+        </div>
     </div>
 
     <script src="./app.js"></script>
